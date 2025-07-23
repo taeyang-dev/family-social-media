@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.vscode/
+.idea/
+
+# Operating System Files
+.DS_Store
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Render specific files (optional, if you have any local config)
+.render/
+
+# Database files (if you have local SQLite DB)
+*.sqlite
+*.db

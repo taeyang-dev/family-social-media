@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#ff69b4" />
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+
+    <script>
+        if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/static/service-worker.js")
+        .then(reg => console.log("Service Worker registered:", reg.scope))
+        .catch(err => console.error("Service Worker error:", err));
+        }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>우리 가족 소셜미디어</title>
