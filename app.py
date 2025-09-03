@@ -17,6 +17,7 @@ db = SQLAlchemy(app)
 
 # 업로드 폴더 생성
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs('instance', exist_ok=True)
 
 # 데이터베이스 모델
 class Post(db.Model):
