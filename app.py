@@ -6,7 +6,7 @@ import uuid
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'family-social-media-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////opt/render/project/src/family_social.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/family_social.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
