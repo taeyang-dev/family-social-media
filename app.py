@@ -4,9 +4,11 @@ from datetime import datetime, date, timedelta
 import os
 import uuid
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'family-social-media-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/family_social.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'family_social.db')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -15,9 +17,12 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 db = SQLAlchemy(app)
 
-# 업로드 폴더 생성
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs('instance', exist_ok=True)
+# Create instance and upload folders before the app context is pushed
+instance_path = os.path.join(basedir, 'instance')
+upload_path = os.path.join(basedir, 'static', 'uploads')
+
+os.makedirs(instance_path, exist_ok=True)
+os.makedirs(upload_path, exist_ok=True)
 
 # 데이터베이스 모델
 class Post(db.Model):
