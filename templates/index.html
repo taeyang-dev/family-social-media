@@ -4,14 +4,13 @@
 <div class="date-display">
     {{ today.strftime('%Y년 %m월 %d일') }} ({{ ['월', '화', '수', '목', '금', '토', '일'][today.weekday()] }}요일)
 </div>
-
+<!-- 로그인된 사용자 표시 -->
+<div style="margin: 8px 0 16px; color:#4a5568; font-weight:600;">
+  현재 사용자: {{ current_author }} <span style="color:#667eea; font-size:1rem;">오늘도 잘지낸다용</span>
+</div>
 <!-- 포스트 작성 폼 -->
 <div class="post-form">
     <form method="POST" action="{{ url_for('create_post') }}" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="author">이름을 입력해 주세요 <span style="color: red;">*</span></label>
-            <input type="text" id="author" name="author" required style="width:100%; padding:15px; border-radius:10px; border:2px solid #e2e8f0; font-size:1.1rem;">
-        </div>
         <div class="form-group">
             <label for="media">사진을 올려주세요 <span style="color: red;">*</span></label>
             <input type="file" id="media" name="media" accept="image/*" required style="display:none;" onchange="updateFileName()">
