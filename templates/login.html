@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>로그인</h2>
+{% if members %}
+  <ul>
+  {% for m in members %}
+    <li><a href="{{ url_for('select_member', member_name=m.name) }}">{{ m.name }}</a></li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>등록된 멤버가 없습니다. <a href="{{ url_for('setup') }}">설정으로 이동</a></p>
+{% endif %}
+{% endblock %}
