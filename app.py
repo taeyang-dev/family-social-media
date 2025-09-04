@@ -10,18 +10,26 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'family-social-media-secret-k
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
-# --- Render Persistent Disk 경로 ---
-DATA_DIR = "/var/data"  # Persistent Disk mount path
+# --- 데이터 저장 경로 선택: /var/data(디스크가 있으면) 아니면 /tmp ---
+def pick_data_dir():
+    p = "/var/data"
+    # 디스크가 실제로 붙었고, 쓰기가 가능할 때만 사용
+    if os.path.isdir(p) and os.access(p, os.W_OK):
+        return p
+    # 폴백: 임시 디렉토리 (재시작 시 사라짐)
+    return "/tmp/appdata"
+
+DATA_DIR = pick_data_dir()
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# DB 저장 경로
-db_path = os.path.join(DATA_DIR, 'family_social.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+# DB 경로
+db_path = os.path.join(DATA_DIR, "family_social.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
 
-# 업로드(사진) 저장 경로
-UPLOAD_DIR = os.path.join(DATA_DIR, 'uploads')
+# 업로드 경로
+UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_DIR
+app.config["UPLOAD_FOLDER"] = UPLOAD_DIR
 
 # 허용된 파일 확장자
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
