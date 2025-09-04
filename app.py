@@ -109,6 +109,32 @@ def login():
         return redirect(url_for('setup'))
     return render_template('login.html', members=members)
 
+import json, os
+
+@app.route("/healthz")
+def healthz():
+    # 기본 헬스체크
+    return "ok"
+
+@app.route("/debug_fs")
+def debug_fs():
+    info = {
+        "DATA_DIR": DATA_DIR,
+        "UPLOAD_FOLDER": app.config.get("UPLOAD_FOLDER"),
+        "db_path": app.config.get("SQLALCHEMY_DATABASE_URI"),
+        "/var/data_exists": os.path.isdir("/var/data"),
+        "/var/data_writable": os.access("/var/data", os.W_OK),
+        "uploads_exists": os.path.isdir(app.config["UPLOAD_FOLDER"]),
+        "uploads_list": [],
+        "whoami": os.getuid(),
+        "cwd": os.getcwd(),
+    }
+    try:
+        info["uploads_list"] = os.listdir(app.config["UPLOAD_FOLDER"])
+    except Exception as e:
+        info["uploads_list"] = [f"error: {e.__class__.__name__}: {e}"]
+    return json.dumps(info, ensure_ascii=False, indent=2), 200, {"Content-Type": "application/json"}
+
 
 @app.route('/select_member/<member_name>')
 def select_member(member_name):
