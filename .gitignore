@@ -1,26 +1,20 @@
 # Python
+venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-env/
-venv/
-*.egg-info/
-.mypy_cache/
-.pytest_cache/
-.vscode/
-.idea/
 
-# Operating System Files
+# OS / IDE
 .DS_Store
-.Trashes
-ehthumbs.db
-Thumbs.db
+.idea/
+.vscode/
 
-# Render specific files (optional, if you have any local config)
-.render/
+# App
+instance/
+*.log
+.env
 
-# Database files (if you have local SQLite DB)
-*.sqlite
-*.db
+# Build
+dist/
+build/
