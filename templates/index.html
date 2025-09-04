@@ -64,7 +64,7 @@ function closeModal() {
                 {% endif %}
                 {% if post.media_path %}
                     <div class="post-media">
-                        <img src="{{ url_for('static', filename='uploads/' + post.media_path) }}" alt="업로드된 이미지" style="cursor:zoom-in;" onclick="showModal(this.src)">
+                        <img src="{{ url_for('serve_upload', filename=post.media_path) }}" alt="업로드된 이미지" style="cursor:zoom-in;" onclick="showModal(this.src)">
                     </div>
                 {% endif %}
                 <div class="post-meta">
