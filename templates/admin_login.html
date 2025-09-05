@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>관리자 로그인</h1>
+<form method="POST" class="card">
+  <label for="pin">관리자 PIN</label>
+  <input type="password" id="pin" name="pin" required />
+  <button type="submit">로그인</button>
+</form>
+<style>
+  .card { max-width: 360px; padding: 16px; border: 1px solid #ddd; border-radius: 12px; }
+  input, button { width:100%; padding:12px; margin-top:8px; font-size:18px; }
+  button { cursor:pointer; }
+</style>
+{% endblock %}
