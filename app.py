@@ -4,11 +4,102 @@ from datetime import datetime, date, timedelta
 import os
 import uuid
 
+from functools import wraps
+from sqlalchemy.exc import IntegrityError
+
+def admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not session.get('is_admin'):
+            flash('관리자 인증이 필요해요.', 'error')
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return wrapper
+
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        pin = request.form.get('pin', '')
+        if pin == app.config['ADMIN_PIN']:
+            session['is_admin'] = True
+            flash('관리자 모드로 들어왔어요.', 'success')
+            return redirect(url_for('manage_members'))
+        else:
+            flash('PIN이 틀렸어요.', 'error')
+    return render_template('admin_login.html')
+
+@app.route('/admin_logout')
+def admin_logout():
+    session.pop('is_admin', None)
+    flash('관리자 모드에서 나왔어요.', 'success')
+    return redirect(url_for('login'))
+
+@app.route('/members', methods=['GET'])
+@admin_required
+def manage_members():
+    members = FamilyMember.query.order_by(FamilyMember.created_at.asc()).all()
+    return render_template('members.html', members=members)
+
+@app.route('/members/add', methods=['POST'])
+@admin_required
+def add_member():
+    name = (request.form.get('name') or '').strip()
+    if not name:
+        flash('이름을 입력해주세요.', 'error')
+        return redirect(url_for('manage_members'))
+    try:
+        db.session.add(FamilyMember(name=name))
+        db.session.commit()
+        flash(f'"{name}"가 추가되었어요.', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('이미 존재하는 이름이에요. 다른 이름을 사용해주세요.', 'error')
+    return redirect(url_for('manage_members'))
+
+@app.route('/members/<int:member_id>/rename', methods=['POST'])
+@admin_required
+def rename_member(member_id):
+    new_name = (request.form.get('new_name') or '').strip()
+    if not new_name:
+        flash('새 이름을 입력해주세요.', 'error')
+        return redirect(url_for('manage_members'))
+    m = FamilyMember.query.get_or_404(member_id)
+    old = m.name
+    try:
+        m.name = new_name
+        db.session.commit()
+        # 이름 변경 시, 해당 사용자가 쓴 게시물의 author도 함께 바꿔줍니다.
+        Post.query.filter_by(author=old).update({Post.author: new_name})
+        db.session.commit()
+        flash(f'"{old}" → "{new_name}"로 변경되었어요.', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('이미 존재하는 이름이에요. 다른 이름을 사용해주세요.', 'error')
+    return redirect(url_for('manage_members'))
+
+@app.route('/members/<int:member_id>/delete', methods=['POST'])
+@admin_required
+def delete_member(member_id):
+    m = FamilyMember.query.get_or_404(member_id)
+    name = m.name
+    # 해당 사용자가 작성한 포스트가 있더라도, 먼저 사용자만 삭제할지 여부는 정책에 따라 달라요.
+    # 여기서는 사용자 삭제만 수행합니다. (포스트는 유지)
+    db.session.delete(m)
+    try:
+        db.session.commit()
+        flash(f'"{name}"가 삭제되었어요.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'삭제 중 오류: {e}', 'error')
+    return redirect(url_for('manage_members'))
+
 # Flask 앱 생성
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'family-social-media-secret-key')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['ADMIN_PIN'] = os.getenv('ADMIN_PIN', '0000')  # 관리자 PIN (기본 0000)
+
 
 # --- 데이터 저장 경로 선택: /var/data(디스크가 있으면) 아니면 /tmp ---
 def pick_data_dir():
