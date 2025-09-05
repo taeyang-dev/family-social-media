@@ -1,13 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>로그인</h2>
-{% if members %}
-  <ul>
-  {% for m in members %}
-    <li><a href="{{ url_for('select_member', member_name=m.name) }}">{{ m.name }}</a></li>
-  {% endfor %}
-  </ul>
+<h1>로그인</h1>
+
+<!-- 상단 관리자 진입 버튼 -->
+<div class="admin-link">
+  <a class="admin-btn" href="{{ url_for('admin_login') }}">⚙️ 가족 등록/수정 (관리자)</a>
+</div>
+
+{% if members|length == 0 %}
+  <p>구성원이 없습니다. <a href="{{ url_for('setup') }}">설정 페이지</a>에서 등록해주세요.</p>
 {% else %}
-  <p>등록된 멤버가 없습니다. <a href="{{ url_for('setup') }}">설정으로 이동</a></p>
+  <div class="grid">
+    {% for m in members %}
+    <a class="big-user" href="{{ url_for('select_member', member_name=m.name) }}">
+      <span class="emoji" aria-hidden="true">👤</span>
+      <span class="label">{{ m.name }}</span>
+    </a>
+    {% endfor %}
+  </div>
 {% endif %}
+
+<style>
+  .admin-link { margin: 8px 0 16px; display:flex; justify-content:flex-start; }
+  .admin-btn {
+    display:inline-block; padding:10px 14px; border-radius:12px;
+    text-decoration:none; font-weight:700;
+    background:#334155; color:#fff; box-shadow:2px 2px 0 #1f2937;
+  }
+  .admin-btn:hover { filter:brightness(1.05); }
+
+  .grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .big-user {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height: 140px; padding: 16px;
+    border: 2px solid #222; border-radius: 20px;
+    text-decoration: none; color: #111; background: #fff;
+    box-shadow: 2px 2px 0 #222; transition: transform .05s ease-in-out;
+    font-size: 28px;
+  }
+  .big-user:hover, .big-user:focus { transform: translateY(-2px); }
+  .emoji { font-size: 40px; margin-bottom: 8px; }
+  .label { font-weight: 800; letter-spacing: 0.5px; }
+  .big-user:focus { outline: 4px solid #99ccff; outline-offset: 4px; }
+  @media (pointer: coarse) {
+    .big-user { min-height: 160px; font-size: 30px; }
+    .emoji { font-size: 44px; }
+  }
+</style>
 {% endblock %}
