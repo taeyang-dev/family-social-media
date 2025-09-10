@@ -2,14 +2,9 @@
 {% block content %}
 <h1>로그인</h1>
 
-<<<<<<< HEAD
 <!-- 상단 관리자 진입 버튼 -->
 <div class="admin-link">
   <a class="admin-btn" href="{{ url_for('admin_login') }}">⚙️ 가족 등록/수정 (관리자)</a>
-=======
-<div class="admin-link">
-  <a href="{{ url_for('admin_login') }}">⚙️ 가족 등록/수정 (관리자)</a>
->>>>>>> ab285cc (Update login template style)
 </div>
 
 {% if members|length == 0 %}
@@ -26,7 +21,6 @@
 {% endif %}
 
 <style>
-<<<<<<< HEAD
   .admin-link { margin: 8px 0 16px; display:flex; justify-content:flex-start; }
   .admin-btn {
     display:inline-block; padding:10px 14px; border-radius:12px;
@@ -35,9 +29,6 @@
   }
   .admin-btn:hover { filter:brightness(1.05); }
 
-=======
-  .admin-link { margin-bottom:16px; }
->>>>>>> ab285cc (Update login template style)
   .grid {
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -45,7 +36,6 @@
   }
   .big-user {
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-<<<<<<< HEAD
     min-height: 140px; padding: 16px;
     border: 2px solid #222; border-radius: 20px;
     text-decoration: none; color: #111; background: #fff;
@@ -56,32 +46,10 @@
   .emoji { font-size: 40px; margin-bottom: 8px; }
   .label { font-weight: 800; letter-spacing: 0.5px; }
   .big-user:focus { outline: 4px solid #99ccff; outline-offset: 4px; }
-=======
-    min-height: 140px;
-    padding: 16px;
-    border: 2px solid #222;
-    border-radius: 20px;
-    text-decoration: none;
-    color: #111;
-    background: #fff;
-    box-shadow: 2px 2px 0 #222;
-    transition: transform .05s ease-in-out;
-    font-size: 28px;  /* 큼직한 글씨 */
-  }
-  .big-user:focus, .big-user:hover { transform: translateY(-2px); }
-  .emoji { font-size: 40px; margin-bottom: 8px; }
-  .label { font-weight: 800; letter-spacing: 0.5px; }
-  /* 접근성: 키보드 포커스 링 */
-  .big-user:focus { outline: 4px solid #99ccff; outline-offset: 4px; }
-  /* 고령자 가독성: 대비 & 터치 영역 */
->>>>>>> ab285cc (Update login template style)
+
   @media (pointer: coarse) {
     .big-user { min-height: 160px; font-size: 30px; }
     .emoji { font-size: 44px; }
   }
 </style>
-<<<<<<< HEAD
 {% endblock %}
-=======
-{% endblock %}
->>>>>>> ab285cc (Update login template style)
