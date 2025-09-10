@@ -184,9 +184,13 @@ def index():
 
 @app.route('/login')
 def login():
-    members = FamilyMember.query.all()
-    if not members:
+    members = FamilyMember.query.order_by(FamilyMember.created_at.asc()).all()
+    settings = Settings.query.first()
+
+    # ✅ 세팅이 안 됐거나 멤버가 없으면 세팅부터
+    if (not settings) or (not settings.is_setup_done) or (len(members) == 0):
         return redirect(url_for('setup'))
+
     return render_template('login.html', members=members)
 
 @app.route("/healthz")
@@ -230,30 +234,36 @@ def logout():
 @app.route('/setup', methods=['GET', 'POST'])
 def setup():
     settings = Settings.query.first()
-    if settings.is_setup_done and request.method == 'GET':
-        return redirect(url_for('login'))
-    if request.method == 'POST':
-        members_str = request.form.get('members', '')
-        if not members_str:
-            flash('가족 구성원을 한 명 이상 입력해 주세요!', 'error')
-            return render_template('setup.html')
-        members = [name.strip() for name in members_str.split(',') if name.strip()]
-        try:
-            for name in members:
-                db.session.add(FamilyMember(name=name))
-            settings.is_setup_done = True
-            db.session.commit()
-            flash('가족 구성원 등록이 완료되었습니다. 이제 로그인하세요!', 'success')
+
+    if request.method == 'GET':
+        # ✅ 멤버가 1명 이상 있을 때만 로그인으로 보냄 (무한 리다이렉트 방지)
+        if settings and settings.is_setup_done and FamilyMember.query.count() > 0:
             return redirect(url_for('login'))
-        except IntegrityError:
-            db.session.rollback()
-            flash('중복된 이름이 있어요. 이름을 바꿔 다시 시도해주세요.', 'error')
-            return render_template('setup.html')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'오류가 발생했습니다: {e}', 'error')
-            return render_template('setup.html')
-    return render_template('setup.html')
+        return render_template('setup.html')
+
+    # POST
+    members_str = request.form.get('members', '')
+    names = [n.strip() for n in members_str.split(',') if n.strip()]
+    if not names:
+        flash('가족 구성원을 한 명 이상 입력해 주세요!', 'error')
+        return render_template('setup.html')
+
+    try:
+        for n in names:
+            db.session.add(FamilyMember(name=n))
+        if not settings:
+            settings = Settings(is_setup_done=True)
+            db.session.add(settings)
+        else:
+            settings.is_setup_done = True
+        db.session.commit()
+        flash('가족 구성원 등록이 완료되었습니다. 이제 로그인하세요!', 'success')
+        return redirect(url_for('login'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'오류가 발생했습니다: {e}', 'error')
+        return render_template('setup.html')
+   
 
 @app.route('/date/<date_str>')
 def date_view(date_str):
